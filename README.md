@@ -1,5 +1,7 @@
 # JsonObjectValidator
 
+![CI](https://github.com/YashanFernando/JsonObjectValidator/actions/workflows/build.yml/badge.svg)
+
 This allows validation of JSON objects by comparing with an anonymous object.
 
 ## How to use
@@ -94,7 +96,6 @@ The following scenarios aren't supported at the moment.
 - Setup as a nuget package
 - Push to Nuget.org
 - Add releases
-- Setup github CI
 
 ## How it works
 
