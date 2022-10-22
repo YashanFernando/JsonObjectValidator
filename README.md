@@ -91,11 +91,6 @@ The following scenarios aren't supported at the moment.
 - Verifying lists of different types
   - It should be possible to create an `Expectation` that expects a `JsonNode` or a `JsonElement` and do custom deserialization but it'll be non-trivial
 
-## TODO
-
-- Setup as a nuget package
-- Push to Nuget.org
-- Add releases
 
 ## How it works
 

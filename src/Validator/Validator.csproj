@@ -7,6 +7,30 @@
         
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <AnalysisMode>All</AnalysisMode>
+
+        <!-- Nuget setup -->
+        <PackageId>JsonObjectValidator</PackageId>
+        <Title>JSON Object Validator</Title>
+        <Authors>YashanFernando</Authors>
+        <Description>Allows validation of JSON objects by comparing with an anonymous object.</Description>
+        <Copyright>Copyright (c) 2022 Yashan Fernando</Copyright>
+        <PackageTags>JSON Testing Validation</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
 
 </Project>
