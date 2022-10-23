@@ -20,21 +20,11 @@ public static class JsonValidator
         JsonSerializerOptions? jsonSerializerOptions = default) where T : class
     {
         JsonNode? actualObject = JsonSerializer.Deserialize<JsonNode>(json, jsonSerializerOptions);
-        TraverseValue(expectedObject, actualObject, "ExpectedObject");
+        TraverseValue(expectedObject, actualObject, jsonSerializerOptions, "ExpectedObject");
     }
 
-    /// <summary>
-    /// Compare a json object to an anonymous object
-    /// </summary>
-    /// <param name="jsonNode">JsonNode to validate</param>
-    /// <param name="expectedObject">expression that returns an anonymous object to compare the JSON to</param>
-    /// <exception cref="JsonValidationException">Validation failure</exception>
-    public static void JsonShouldLookLike<T>(this JsonNode? jsonNode, T expectedObject) where T : class
-    {
-        TraverseValue(expectedObject, jsonNode, "ExpectedObject");
-    }
-
-    private static void TraverseValue(object? expectedObject, JsonNode? actualObject, string path)
+    private static void TraverseValue(object? expectedObject, JsonNode? actualObject, JsonSerializerOptions? options,
+        string path)
     {
         if (expectedObject is null && actualObject is null)
             return;
@@ -47,7 +37,7 @@ public static class JsonValidator
         // Handle expectations
         if (expectedObjectType.IsExpectation())
         {
-            RunExpectation(expectedObject, actualObject, path);
+            RunExpectation(expectedObject, actualObject, options, path);
             return;
         }
 
@@ -59,25 +49,21 @@ public static class JsonValidator
         if (expectedObjectType.IsClass
             && expectedObjectType.IsAnonymousObject())
         {
-            TraverseObject(expectedObject, actualObject, path);
+            TraverseObject(expectedObject, actualObject, options, path);
             return;
         }
 
         // Handle new array initializers
-        if (expectedObjectType.IsArray)
+        if (expectedObjectType.IsArray && expectedObject is Array expectedArray)
         {
-            Array? expectedArray = expectedObject as Array;
             JsonArray actualArray = actualObject.AsArray();
 
-            if (expectedArray is null || actualArray is null)
-                throw new InvalidOperationException();
-
-            TraverseArray(expectedArray, actualArray, path);
+            TraverseArray(expectedArray, actualArray, options, path);
             return;
         }
 
         // Check if the two objects/values are equal
-        if (expectedObject.Equals(Deserialize(actualObject, expectedObjectType, path)))
+        if (expectedObject.Equals(Deserialize(actualObject, expectedObjectType, options, path)))
         {
             return;
         }
@@ -86,7 +72,8 @@ public static class JsonValidator
         throw new JsonValidationException("Values don't match", path);
     }
 
-    private static void TraverseObject(object expectedObject, JsonNode actualObject, string position)
+    private static void TraverseObject(object expectedObject, JsonNode actualObject,
+        JsonSerializerOptions? options, string position)
     {
         Type expectedObjectType = expectedObject.GetType();
         var properties = expectedObjectType.GetProperties();
@@ -97,11 +84,12 @@ public static class JsonValidator
             object? expectedValue = property.GetValue(expectedObject);
             JsonNode? actualValue = actualObject[property.Name];
 
-            TraverseValue(expectedValue, actualValue, string.Join('.', position, property.Name));
+            TraverseValue(expectedValue, actualValue, options, string.Join('.', position, property.Name));
         }
     }
 
-    private static void TraverseArray(Array expectedArray, JsonArray actualArray, string path)
+    private static void TraverseArray(Array expectedArray, JsonArray actualArray,
+        JsonSerializerOptions? options, string path)
     {
         if(expectedArray.Length != actualArray.Count)
             throw new JsonValidationException("Lists have different lengths", path);
@@ -112,15 +100,16 @@ public static class JsonValidator
             object? expected = expectedArray.GetValue(i);
             JsonNode? actual = actualArray[i];
 
-            TraverseValue(expected, actual, $"{path}[{i}]");
+            TraverseValue(expected, actual, options, $"{path}[{i}]");
         }
     }
 
-    private static void RunExpectation(object expectedObject, JsonNode? actual, string path)
+    private static void RunExpectation(object expectedObject, JsonNode? actual, JsonSerializerOptions? options,
+        string path)
     {
         Type expectedObjectType = expectedObject.GetType();
         Type internalType = expectedObjectType.GenericTypeArguments[0];
-        var actualValue = Deserialize(actual, internalType, path);
+        object? actualValue = Deserialize(actual, internalType, options, path);
 
         MethodInfo verifyMethod = expectedObjectType.GetMethod(nameof(Expectation<string>.Verify),
             BindingFlags.NonPublic | BindingFlags.Instance)!;
@@ -131,11 +120,11 @@ public static class JsonValidator
             throw new JsonValidationException("Expectation failed", path);
     }
 
-    private static object? Deserialize(JsonNode? jsonNode, Type type, string path)
+    private static object? Deserialize(JsonNode? jsonNode, Type type, JsonSerializerOptions? options, string path)
     {
         try
         {
-            return jsonNode.Deserialize(type);
+            return jsonNode.Deserialize(type, options);
         }
         catch (JsonException e)
         {
