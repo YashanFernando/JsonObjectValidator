@@ -35,14 +35,16 @@ public class BasicSadValidationTests
     [Test]
     public void NullJsonValue()
     {
-        Assert.Throws<JsonValidationException>(() =>
+        var exception = Assert.Throws<JsonValidationException>(() =>
         {
             "{ \"TestProperty\": null }"
                 .JsonShouldLookLike(new
             {
-                TestProperty = new int?(2)
+                TestProperty = 2
             });
         });
+
+        Assert.That(exception.ActualObject, Is.Null);
     }
 
     [Test]
@@ -105,19 +107,25 @@ public class BasicSadValidationTests
     [Test]
     public void ExpectLess()
     {
-        Assert.Throws<JsonValidationException>(() =>
+        var exception = Assert.Throws<JsonValidationException>(() =>
         {
             "[ 10, 5, 6 ]".JsonShouldLookLike(new[] { 10, 5 });
         });
+
+        Assert.That(exception!.Path, Is.EqualTo("ExpectedObject"));
+        Assert.That(exception.Message, Does.StartWith("Lists have different lengths. Expected 2 but got 3."));
     }
 
     [Test]
     public void ExpectMore()
     {
-        Assert.Throws<JsonValidationException>(() =>
+        var exception = Assert.Throws<JsonValidationException>(() =>
         {
             "[ 10, 5, 6 ]".JsonShouldLookLike(new[] { 10, 5, 6, 1 });
         });
+
+        Assert.That(exception!.Path, Is.EqualTo("ExpectedObject"));
+        Assert.That(exception.Message, Does.StartWith("Lists have different lengths. Expected 4 but got 3."));
     }
 
     [Test]
@@ -226,6 +234,7 @@ public class BasicSadValidationTests
         });
 
         Assert.That(exception!.Path, Is.EqualTo("ExpectedObject.TestProperty[0].SecondaryValue[2]"));
+        Assert.That(exception.ActualObject, Is.EqualTo("6"));
     }
 
     [Test]

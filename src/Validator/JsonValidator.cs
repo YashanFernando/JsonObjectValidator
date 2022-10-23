@@ -30,7 +30,8 @@ public static class JsonValidator
             return;
 
         if (expectedObject is null)
-            throw new JsonValidationException($"Expected null but actual is {actualObject?.ToJsonString()}", path);
+            throw new JsonValidationException($"Expected null but actual is not", path,
+                actualObject?.ToJsonString());
 
         Type expectedObjectType = expectedObject.GetType();
 
@@ -43,7 +44,7 @@ public static class JsonValidator
 
         // We know the expected object is not null at this point so if the actualObject is null, they aren't equal.
         if (actualObject is null)
-            throw new JsonValidationException("Expected a value but the actual is null", path);
+            throw new JsonValidationException("Expected a value but the actual is null", path, null);
 
         // Handle new anonymous object initializers
         if (expectedObjectType.IsClass
@@ -69,7 +70,7 @@ public static class JsonValidator
         }
 
         // Throw if the values don't match or if it's an unhandled expression type
-        throw new JsonValidationException("Values don't match", path);
+        throw new JsonValidationException("Values don't match", path, actualObject.ToJsonString());
     }
 
     private static void TraverseObject(object expectedObject, JsonNode actualObject,
@@ -92,7 +93,9 @@ public static class JsonValidator
         JsonSerializerOptions? options, string path)
     {
         if(expectedArray.Length != actualArray.Count)
-            throw new JsonValidationException("Lists have different lengths", path);
+            throw new JsonValidationException(
+                $"Lists have different lengths. Expected {expectedArray.Length} but got {actualArray.Count}.",
+                path, actualArray.ToJsonString());
 
         // Iterate through the initializer expressions inside initializer of the array
         for (int i = 0; i < expectedArray.Length; i++)
@@ -117,7 +120,7 @@ public static class JsonValidator
         bool successful = (bool) verifyMethod.Invoke(expectedObject, new[] { actualValue })!;
 
         if (!successful)
-            throw new JsonValidationException("Expectation failed", path);
+            throw new JsonValidationException("Expectation failed", path, actual?.ToJsonString());
     }
 
     private static object? Deserialize(JsonNode? jsonNode, Type type, JsonSerializerOptions? options, string path)
@@ -128,7 +131,8 @@ public static class JsonValidator
         }
         catch (JsonException e)
         {
-            throw new JsonValidationException($"Couldn't deserialize into {type.Name}", path, e);
+            throw new JsonValidationException($"Couldn't deserialize into {type.Name}", path,
+                jsonNode?.ToJsonString(), e);
         }
     }
 }
