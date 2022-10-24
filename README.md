@@ -66,16 +66,6 @@ For more examples, see the tests.
     {
         PropertyNameCaseInsensitive = true
     });
-    
-    
-// Verify JsonNode
-JsonSerializer
-  .Deserialize<JsonNode>("{ \"InnerObject\": { \"TestProperty\": 15 } }")!
-  ["InnerObject"]
-  .JsonShouldLookLike(new
-  {
-      TestProperty = 15,
-  });
 ```
 
 
@@ -83,12 +73,11 @@ JsonSerializer
 
 The following scenarios aren't supported at the moment.
 
-- Verifying lists (can use arrays instead)
 - Verifying against concrete classes 
   - Mostly out of scope here but if the equality comparison operators are implemented it should work
   - Records and structs should work as well
   - `IEquatable`, `IComparable` interfaces aren't supported
-- Verifying lists of different types
+- Verifying lists with elements of different types
   - It should be possible to create an `Expectation` that expects a `JsonNode` or a `JsonElement` and do custom deserialization but it'll be non-trivial
 
 

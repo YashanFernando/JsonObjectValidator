@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -54,10 +55,14 @@ public static class JsonValidator
             return;
         }
 
-        // Handle new array initializers
-        if (expectedObjectType.IsArray && expectedObject is Array expectedArray)
+        // Handle IEnumerable types and arrays
+        if (expectedObject is IEnumerable enumerable and not string)
         {
-            JsonArray actualArray = actualObject.AsArray();
+            if (actualObject is not JsonArray actualArray)
+                throw new JsonValidationException("Expected an array but the actual is not", path,
+                    actualObject.ToJsonString());
+
+            object[] expectedArray = enumerable.Cast<object>().ToArray();
 
             TraverseArray(expectedArray, actualArray, options, path);
             return;

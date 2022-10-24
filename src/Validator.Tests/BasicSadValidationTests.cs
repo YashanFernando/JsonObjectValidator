@@ -252,4 +252,36 @@ public class BasicSadValidationTests
         Assert.That(exception!.Path, Is.EqualTo("ExpectedObject.TestProperty"));
         Assert.IsInstanceOf<JsonException>(exception.InnerException);
     }
+
+    [Test]
+    public void ExpectInvalidTypeValueOnArray()
+    {
+        var exception = Assert.Throws<JsonValidationException>(() =>
+        {
+            "{ \"TestProperty\": [ 5, 6 ] }"
+                .JsonShouldLookLike(new
+            {
+                TestProperty = new[] { "Five", "Six" }
+            });
+        });
+
+        Assert.That(exception!.Path, Is.EqualTo("ExpectedObject.TestProperty[0]"));
+        Assert.IsInstanceOf<JsonException>(exception.InnerException);
+    }
+
+    [Test]
+    public void ExpectArrayWhenNotAnArray()
+    {
+        var exception = Assert.Throws<JsonValidationException>(() =>
+        {
+            "{ \"TestProperty\": 5 }"
+                .JsonShouldLookLike(new
+            {
+                TestProperty = new[] { 5, 6 }
+            });
+        });
+
+        Assert.That(exception!.Path, Is.EqualTo("ExpectedObject.TestProperty"));
+        Assert.That(exception.Message, Does.StartWith("Expected an array but the actual is not"));
+    }
 }

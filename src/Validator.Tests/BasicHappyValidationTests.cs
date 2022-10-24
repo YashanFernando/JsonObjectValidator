@@ -182,4 +182,26 @@ public class BasicHappyValidationTests
             TestedProperty = "TestedValue"
         });
     }
+
+    [Test]
+    public void IntList()
+    {
+        "[ 10, 5, 6 ]".JsonShouldLookLike(new List<int> { 10, 5, 6 });
+    }
+
+    [Test]
+    public void ObjectList()
+    {
+        "[ { \"TestProperty\": 1 }, { \"TestProperty\": 2 } ]".JsonShouldLookLike(new List<object>
+        {
+            new
+            {
+                TestProperty = 1
+            },
+            new
+            {
+                TestProperty = 2
+            }
+        });
+    }
 }
