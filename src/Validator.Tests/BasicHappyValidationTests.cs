@@ -204,4 +204,13 @@ public class BasicHappyValidationTests
             }
         });
     }
+
+    [Test]
+    public void ArrayOfDifferentTypes()
+    {
+"[ 1, \"Two\", [ 3 ] ]".JsonShouldLookLike(new object[]
+{
+    1, "Two", new[] { 3 }
+});
+    }
 }

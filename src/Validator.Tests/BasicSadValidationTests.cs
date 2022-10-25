@@ -284,4 +284,16 @@ public class BasicSadValidationTests
         Assert.That(exception!.Path, Is.EqualTo("ExpectedObject.TestProperty"));
         Assert.That(exception.Message, Does.StartWith("Expected an array but the actual is not"));
     }
+
+    [Test]
+    public void ArrayOfDifferentTypes()
+    {
+        Assert.Throws<JsonValidationException>(() =>
+        {
+            "[ 1, \"Two\", [ 3 ] ]".JsonShouldLookLike(new object[]
+            {
+                1, "Two", new[] { 4 }
+            });
+        });
+    }
 }

@@ -1,8 +1,75 @@
 # JsonObjectValidator
 
-![CI](https://github.com/YashanFernando/JsonObjectValidator/actions/workflows/build.yml/badge.svg)
+[![CI](https://github.com/YashanFernando/JsonObjectValidator/actions/workflows/build.yml/badge.svg)](https://github.com/YashanFernando/JsonObjectValidator/actions/workflows/build.yml)
+[![Nuget](https://img.shields.io/nuget/v/JsonObjectValidator)](https://www.nuget.org/packages/JsonObjectValidator)
 
 This allows validation of JSON objects by comparing with an anonymous object.
+
+
+## Why
+
+The main goal of this library is to allow comparing a JSON string against an object graph built using anonymous objects. While it's easy to deserialize a JSON string to an anonymous object and compare the two objects, that doesn't allow us to perform any custom comparisons. Custom comparisons allow us to perform comparisons such as,
+- Approximate values (Such as verifying a timestamp is within a known range)
+- Advanced list comparisons (Verify a list length while ignoring the contents)
+
+For an example,
+
+```csharp
+@"
+{ 
+    ""IpAddress"": ""192.168.0.3"",
+    ""WebsiteName"": ""TestSite"",
+    ""Citations"": null,
+    ""Articles"": 
+        [ 
+            { 
+                ""Author"": null, 
+                ""Timestamp"": ""2012-04-23T18:25:43.511Z"",
+                ""ViewCount"": 5
+            }, 
+            { 
+                ""Author"": ""Jane Doe"", 
+                ""Timestamp"": ""2015-04-23T18:25:43.511Z"",
+                ""ViewCount"": 3
+            }
+        ] 
+}"
+.JsonShouldLookLike(new
+{
+    // Ignore the IP address field by not including it here
+
+    // Compare the values directly
+    WebsiteName = "TestSite",
+
+    // Verify the field exists and it's null
+    Citations = JsonMatcher.ExpectNull(),
+
+    // THIS IS KEY.. We use use a generic list of objects to allow list items of different types
+    Articles = new object[]
+    {
+        new
+        {
+            Author = JsonMatcher.ExpectNull(),
+
+            // Custom validation
+            Timestamp = JsonMatcher.Expect<DateTime>(d => d.Year == 2012),
+
+            ViewCount = 5
+        },
+        new
+        {
+            Author = "Jane Doe",
+
+            // Verify field exists and it contains a DateTime
+            Timestamp = JsonMatcher.ExpectAny<DateTime>(),
+
+            ViewCount = 3
+        }
+    }
+});
+
+```
+
 
 ## How to use
 
@@ -17,9 +84,12 @@ Only the properties in the object that's passed in are compared.
 });
 ```
 
-### Compare arrays
+### Compare arrays/lists
 
 Arrays can be compared too. The individual values will be compared in order.
+
+If the list contains expectations, or when verifying a list of different types use `new object[]` to allow mixing and matching expectations and types.
+
 ```csharp
 // Arrays on their own
 "[ 10, 5, 6 ]".JsonShouldLookLike(new[] { 10, 5, 6 });
@@ -36,6 +106,14 @@ Arrays can be compared too. The individual values will be compared in order.
         TestProperty = 2
     }
 });
+
+
+// Lists of different types
+"[ 1, \"Two\", [ 3 ] ]".JsonShouldLookLike(new object[]
+{
+    1, "Two", new[] { 3 }
+});
+
 ```
 
 ### Custom Comparisons
@@ -43,15 +121,29 @@ Arrays can be compared too. The individual values will be compared in order.
 For values that needs custom matching, an `Expectation` can be created. This is useful in situations when the exact value is not known such as comparing timestamps.
 
 ```csharp
+// Expect a value with custom behavior
 "{ \"TestProperty\": 15, \"ExpectedProperty\": 5 }"
     .JsonShouldLookLike(new
 {
     TestProperty = 15,
     ExpectedProperty = JsonMatcher.Expect<int>(val => val is > 4 and < 15)
 });
-```
 
-For more examples, see the tests.
+// Expect any value of a given type
+"{ \"ExpectedProperty\": 5 }"
+    .JsonShouldLookLike(new
+{
+    ExpectedProperty = JsonMatcher.ExpectAny<int>()
+});
+
+
+// Expect the value to be null
+"{ \"ExpectedProperty\": null }"
+    .JsonShouldLookLike(new
+{
+    ExpectedProperty = JsonMatcher.ExpectNull()
+});
+```
 
 ### Custom Deserialization
 
@@ -68,6 +160,9 @@ For more examples, see the tests.
     });
 ```
 
+### More examples
+For more examples, [see the tests](/src/Validator.Tests).
+
 
 ## Known Limitations
 
@@ -77,12 +172,10 @@ The following scenarios aren't supported at the moment.
   - Mostly out of scope here but if the equality comparison operators are implemented it should work
   - Records and structs should work as well
   - `IEquatable`, `IComparable` interfaces aren't supported
-- Verifying lists with elements of different types
-  - It should be possible to create an `Expectation` that expects a `JsonNode` or a `JsonElement` and do custom deserialization but it'll be non-trivial
 
 
 ## How it works
 
 This was inspired by the wonderful [ExpectedObject](https://github.com/derekgreer/expectedObjects) and [SpecsFor](https://github.com/MattHoneycutt/SpecsFor) projects.
 
-It uses reflection to get the properties of the expected anonymous object and to get individual values of arrays. Then it deserializes the actual object to expected type specified in the expected object and compared against it.
+It uses reflection to get the properties of the expected anonymous object and to get individual values of an enumerable. Then it deserializes the actual object to type specified in the expected object and compares against it.

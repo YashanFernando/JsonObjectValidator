@@ -59,4 +59,61 @@ public class ExpectationHappyTests
             ExpectedProperty = JsonMatcher.Expect<int>(val => val is > 4 and < 15)
         });
     }
+
+    [Test]
+    public void ExampleForReadme()
+    {
+        @"
+        { 
+            ""WebsiteIpAddress"": ""192.168.0.3"",
+            ""WebsiteName"": ""TestSite"",
+            ""Citations"": null,
+            ""Articles"": 
+                [ 
+                    { 
+                        ""Author"": null, 
+                        ""Timestamp"": ""2012-04-23T18:25:43.511Z"",
+                        ""ViewCount"": 5
+                    }, 
+                    { 
+                        ""Author"": ""Jane Doe"", 
+                        ""Timestamp"": ""2015-04-23T18:25:43.511Z"",
+                        ""ViewCount"": 3
+                    }
+                ] 
+        }"
+        .JsonShouldLookLike(new
+        {
+            // Ignore the IP address field by not including it here
+
+            // Compare the values directly
+            WebsiteName = "TestSite",
+
+            // Verify the field exists and it's null
+            Citations = JsonMatcher.ExpectNull(),
+
+            // THIS IS KEY.. We use use a generic list of objects to allow list items of different types
+            Articles = new object[]
+            {
+                new
+                {
+                    Author = JsonMatcher.ExpectNull(),
+
+                    // Custom validation
+                    Timestamp = JsonMatcher.Expect<DateTime>(d => d.Year == 2012),
+
+                    ViewCount = 5
+                },
+                new
+                {
+                    Author = "Jane Doe",
+
+                    // Verify field exists and it contains a DateTime
+                    Timestamp = JsonMatcher.ExpectAny<DateTime>(),
+
+                    ViewCount = 3
+                }
+            }
+        });
+    }
 }
