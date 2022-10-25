@@ -26,7 +26,7 @@ public class ExpectationHappyTests
     public void ExpectNullableValues()
     {
         "[ { \"TestProperty\": null }, { \"TestProperty\": 5 } ]"
-            .JsonShouldLookLike(new[]
+            .JsonShouldLookLike(new Object[]
         {
             new
             {
@@ -34,7 +34,7 @@ public class ExpectationHappyTests
             },
             new
             {
-                TestProperty = JsonMatcher.ExpectValue<int?>(5)
+                TestProperty = 5
             }
         });
     }

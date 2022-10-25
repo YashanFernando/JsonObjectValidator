@@ -24,10 +24,7 @@ public class ConcreteTypeValidationTests
         "{ \"TestProperty\": { \"InnerInt\": 5 } }"
             .JsonShouldLookLike(new
         {
-            TestProperty = JsonMatcher.ExpectValue(new TestObject
-            {
-                InnerInt = 5
-            })
+            TestProperty = JsonMatcher.Expect<TestObject>(o => o.InnerInt == 5)
         });
     }
 
