@@ -21,6 +21,8 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <AssemblyName>JsonObjectValidator</AssemblyName>
+        <RootNamespace>JsonObjectValidator</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

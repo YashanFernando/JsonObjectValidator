@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Validator;
+namespace JsonObjectValidator;
 
 [StackTraceHidden]
 public class Expectation<T>

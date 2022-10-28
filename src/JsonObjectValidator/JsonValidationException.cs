@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Validator;
+namespace JsonObjectValidator;
 
 [SuppressMessage("Design", "CA1032:Implement standard exception constructors")]
 public sealed class JsonValidationException : Exception

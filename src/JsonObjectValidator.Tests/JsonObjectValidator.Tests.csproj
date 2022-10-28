@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Validator\Validator.csproj" />
+      <ProjectReference Include="..\JsonObjectValidator\JsonObjectValidator.csproj" />
     </ItemGroup>
 
 </Project>

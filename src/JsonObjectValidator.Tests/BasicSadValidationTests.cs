@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Validator.Tests;
+namespace JsonObjectValidator.Tests;
 
 public class BasicSadValidationTests
 {

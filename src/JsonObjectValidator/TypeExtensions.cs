@@ -1,4 +1,4 @@
-﻿namespace Validator;
+﻿namespace JsonObjectValidator;
 
 internal static class TypeExtensions
 {

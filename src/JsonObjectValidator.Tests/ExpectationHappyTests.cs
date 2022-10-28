@@ -1,4 +1,4 @@
-namespace Validator.Tests;
+namespace JsonObjectValidator.Tests;
 
 public class ExpectationHappyTests
 {

@@ -2,7 +2,7 @@
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace Validator.Tests;
+namespace JsonObjectValidator.Tests;
 
 public class JsonSerializerOptionsTests
 {

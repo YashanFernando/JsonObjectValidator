@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Validator;
+namespace JsonObjectValidator;
 
 public static class JsonMatcher
 {
