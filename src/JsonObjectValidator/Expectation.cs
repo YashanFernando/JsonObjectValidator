@@ -18,7 +18,7 @@ public class Expectation<T>
     }
 
     /// <summary>
-    /// For internal use only. Used to validate the expectation.
+    /// Used to validate the expectation.
     /// </summary>
-    internal bool Verify(T input) => _expectation(input);
+    public bool Verify(T input) => _expectation(input);
 }

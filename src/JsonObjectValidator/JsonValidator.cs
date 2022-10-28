@@ -119,9 +119,7 @@ public static class JsonValidator
         Type internalType = expectedObjectType.GenericTypeArguments[0];
         object? actualValue = Deserialize(actual, internalType, options, path);
 
-        MethodInfo verifyMethod = expectedObjectType.GetMethod(nameof(Expectation<string>.Verify),
-            BindingFlags.NonPublic | BindingFlags.Instance)!;
-
+        MethodInfo verifyMethod = expectedObjectType.GetMethod(nameof(Expectation<string>.Verify))!;
         bool successful = (bool) verifyMethod.Invoke(expectedObject, new[] { actualValue })!;
 
         if (!successful)
