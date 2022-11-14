@@ -23,10 +23,18 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <AssemblyName>JsonObjectValidator</AssemblyName>
         <RootNamespace>JsonObjectValidator</RootNamespace>
+
+        <!-- Workaround: https://github.com/dotnet/sourcelink/issues/572#issuecomment-1047399068 -->
+        <TargetFrameworkMonikerAssemblyAttributesPath>$([System.IO.Path]::Combine('$(IntermediateOutputPath)','$(TargetFrameworkMoniker).AssemblyAttributes$(DefaultLanguageSourceExtension)'))</TargetFrameworkMonikerAssemblyAttributesPath>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+
+        <!-- Workaround: https://github.com/dotnet/sourcelink/issues/572#issuecomment-1047399068 -->
+        <EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>
+        <EmbeddedFiles Include="$(GeneratedGlobalUsingsFile)"/>
+        <EmbeddedFiles Include="$(TargetFrameworkMonikerAssemblyAttributesPath)"/>
     </ItemGroup>
 
     <ItemGroup>
