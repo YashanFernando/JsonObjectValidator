@@ -61,6 +61,16 @@ public class ExpectationHappyTests
     }
 
     [Test]
+    public void ExpectUnorderedList()
+    {
+        "[ 1, 2, 3 ]"
+            .JsonShouldLookLike(JsonMatcher.ExpectUnorderedList(new[]
+        {
+            3, 2, 1
+        }));
+    }
+
+    [Test]
     public void ExampleForReadme()
     {
         @"

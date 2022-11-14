@@ -66,4 +66,17 @@ public class ExpectationSadTests
 
         Assert.That(exception!.Path, Is.EqualTo("ExpectedObject[0].TestProperty"));
     }
+
+    [Test]
+    public void ExpectUnorderedList()
+    {
+        Assert.Throws<JsonValidationException>(() =>
+        {
+            "[ 1, 2, 3 ]"
+                .JsonShouldLookLike(JsonMatcher.ExpectUnorderedList(new[]
+            {
+                3, 2, 4
+            }));
+        });
+    }
 }
