@@ -17,13 +17,13 @@ jobs:
           dotnet-version: '6.x'
 
       - name: Build
-        run: dotnet build --configuration Release Validator
+        run: dotnet build --configuration Release JsonObjectValidator
         working-directory: src
 
       - name: Create the package
-        run: dotnet pack --configuration Release Validator /p:Version=${{ github.event.release.tag_name }} /p:ContinuousIntegrationBuild=true
+        run: dotnet pack --configuration Release JsonObjectValidator /p:Version=${{ github.event.release.tag_name }} /p:ContinuousIntegrationBuild=true
         working-directory: src
 
       - name: Publish the package to nuget.org
-        run: dotnet nuget push Validator/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_SECRET }} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push JsonObjectValidator/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_SECRET }} --source https://api.nuget.org/v3/index.json
         working-directory: src
